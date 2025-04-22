@@ -1,10 +1,11 @@
 import os
 import tarfile
-import toml
+from collections import defaultdict
+
 import numpy as np
 import pandas as pd
+import toml
 from PIL import Image
-from collections import defaultdict
 
 
 class FrameDataReader:
