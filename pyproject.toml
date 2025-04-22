@@ -1,3 +1,7 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
 [project]
 name = "lac-data"
 version = "0.1.0"
@@ -21,3 +25,6 @@ dev = [
     "coverage[toml]>=7.8.0",
     "pytest-cov>=6.0.0",
 ]
+
+[tool.hatch.build]
+include = ["src"]
