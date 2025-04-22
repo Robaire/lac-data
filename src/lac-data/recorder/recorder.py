@@ -1,7 +1,7 @@
 import io
-import os
 import tarfile
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 import toml
@@ -17,7 +17,7 @@ class Recorder:
     # When the agent is done, call stop to save the data
     agent: None  # AutonomousAgent
     max_size: float  # Maximum size of the archive in GB
-    tar_path: str  # Output archive path
+    tar_path: Path  # Output archive path
     tar_file: tarfile.TarFile  # Output archive
 
     # Recording state
@@ -33,19 +33,19 @@ class Recorder:
     # Custom recorders
     custom_records: dict = {}  # Custom records
 
-    def __init__(self, agent, output_file=None, max_size: float = 10):
+    def __init__(self, agent, output="", max_size: float = 10):
         """Initialize the recorder.
 
         Args:
             agent: The agent to record data from
-            output: Output file path (will be gzipped)
+            output: Output directory or file name
             max_size: Maximum size of the archive in GB
         """
         self.agent = agent
         self.max_size = max_size
 
         # Create the archive file
-        self.tar_path = self._parse_file_name(output_file)
+        self.tar_path = self._parse_file_name(output)
         self.tar_file = tarfile.open(self.tar_path, "w:gz")
 
         # Create numerical data buffers
@@ -259,21 +259,32 @@ class Recorder:
         """Check if the archive is over the size limit."""
 
         self.tar_file.flush()
-        if os.path.getsize(self.tar_path) > self.max_size * 1024 * 1024 * 1024:
+        if self.tar_path.stat().st_size > self.max_size * 1024 * 1024 * 1024:
             self.stop()
 
-    def _parse_file_name(self, output_file) -> str:
+    def _parse_file_name(self, file_path: str) -> Path:
         """Parse the output file name."""
 
-        # If no output file is provided, use the current timestamp
-        if output_file is None:
-            output_file = f"run-{datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.tar.gz"
+        # Expand the user path and make it absolute
+        file_path = Path(file_path).expanduser().resolve()
 
-        # Check if the file already has the .tar.gz extension
-        if not output_file.endswith(".tar.gz"):
-            output_file = f"{output_file}.tar.gz"
+        # Check if the output is a directory
+        if file_path.is_dir():
+            # Create a new file name with the current timestamp
+            file_path = (
+                file_path / f"sim-{datetime.now().strftime('%Y-%m-%d_%H.%M.%S')}.lac"
+            )
 
-        return output_file
+        if file_path.exists():
+            # Append a timestamp to the file name
+            file_path = (
+                file_path.stem
+                / f"-{datetime.now().strftime('%H.%M.%S')}"
+                / file_path.suffix
+            )
+
+        # Return the file path
+        return file_path
 
     def description(self, description: str):
         """Set a description for the run if desired."""
@@ -351,5 +362,4 @@ class Recorder:
             )
 
         self.tar_file.close()  # Flush the buffer to the file
-        os.chmod(self.tar_path, 0o666)  # Set the archive file permissions
         self.done = True  # Set the done flag
