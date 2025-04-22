@@ -7,7 +7,7 @@ import pandas as pd
 import toml
 from PIL import Image
 
-from maple.utils import carla_to_pytransform, pytransform_to_tuple
+from .._util import transform_to_tuple
 
 
 class Recorder:
@@ -67,11 +67,11 @@ class Recorder:
 
         # Record agent configuration and simulation start parameters
         self.initial["fiducials"] = self.agent.use_fiducials()  # bool
-        self.initial["lander"] = pytransform_to_tuple(
-            carla_to_pytransform(self.agent.get_initial_lander_position())
+        self.initial["lander"] = transform_to_tuple(
+            self.agent.get_initial_lander_position()
         )  # [x, y, z, roll, pitch, yaw]
-        self.initial["rover"] = pytransform_to_tuple(
-            carla_to_pytransform(self.agent.get_initial_position())
+        self.initial["rover"] = transform_to_tuple(
+            self.agent.get_initial_position()
         )  # [x, y, z, roll, pitch, yaw]
 
         # Record initial sensor configuration
@@ -116,7 +116,7 @@ class Recorder:
             return
 
         # Get agent data
-        pose = pytransform_to_tuple(carla_to_pytransform(self.agent.get_transform()))
+        pose = transform_to_tuple(self.agent.get_transform())
         imu_data = self.agent.get_imu_data()  # [ax, ay, az, gx, gy, gz]
         mission_time = self.agent.get_mission_time()  # float [s]
         power = self.agent.get_current_power()  # float [Wh]
@@ -167,15 +167,11 @@ class Recorder:
 
             # This means that the light state may not be accurate for frames without images, but we rarely change the lights
 
-            position = pytransform_to_tuple(
-                carla_to_pytransform(self.agent.get_camera_position(camera))
-            )  # [x, y, z, roll, pitch, yaw]
+            position = transform_to_tuple(self.agent.get_camera_position(camera))
             light_intensity = self.agent.get_light_state(camera)
 
             # This is always a fixed offset from the camera position and we dont really care about it anyways
-            # light_position = pytransform_to_tuple(
-            #     carla_to_pytransform(self.agent.get_light_position(camera))
-            # )  # [x, y, z, roll, pitch, yaw]
+            # light_position = transform_to_tuple(self.agent.get_light_position(camera))
 
             # Get the grayscale image if the camera is active
             # This should never raise a KeyError since we check enabled first
