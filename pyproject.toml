@@ -1,0 +1,23 @@
+[project]
+name = "lac-data"
+version = "0.1.0"
+description = "Data recording and processing for the Lunar Autonomy Challenge"
+authors = [
+    { name="Robaire Galliath", email="galliath.robaire@gmail.com" },
+]
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "pandas",
+    "pillow",
+    "toml",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "coverage[toml]>=7.8.0",
+    "pytest-cov>=6.0.0",
+]
