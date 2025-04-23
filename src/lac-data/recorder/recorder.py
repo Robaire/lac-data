@@ -235,12 +235,13 @@ class Recorder:
         }
         """
 
-    def record_custom(self, name: str, data: dict):
+    def record_custom(self, frame: int, record_name: str, data: dict):
         """Record custom data."""
+        data["frame"] = frame
         try:
-            self.custom_records[name].append(data)
+            self.custom_records[record_name].append(data)
         except KeyError:
-            self.custom_records[name] = [data]
+            self.custom_records[record_name] = [data]
 
     def _add_image(self, image, camera, type: str, frame: int) -> str:
         """Add an image in the archive."""
@@ -317,6 +318,10 @@ class Recorder:
             raise RuntimeError("Cannot resume recording after it has been stopped.")
 
         self.paused = False
+
+    def is_done(self):
+        """Check if the recording is done."""
+        return self.done
 
     def stop(self):
         """Stop recording and save the archive."""
