@@ -27,4 +27,4 @@ dev = [
 ]
 
 [tool.hatch.build]
-include = ["src"]
+sources = ["src"]
