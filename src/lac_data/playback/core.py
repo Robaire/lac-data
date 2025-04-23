@@ -128,6 +128,7 @@ class CameraDataReader:
         try:
             camera_frame = self._frame_data.camera_frames[camera]
         except KeyError:
+            # The camera was never enabled
             raise ValueError(f"Camera {camera} not found")
 
         # Find the row for the frame number
@@ -160,11 +161,15 @@ class CameraDataReader:
         ):
             raise ValueError(f"Camera {camera} does not have semantic images enabled.")
 
-        # Find the file name for the image at this frame
-        frame_data = self.get_frame(camera, frame)
+        # Try to get data for the camera at this frame
+        try:
+            frame_data = self.get_frame(camera, frame)
+        except ValueError:
+            # The camera was never enabled, no images exist for this camera
+            return None
 
-        # If the frame data is not found, return None
         if frame_data is None:
+            # Camera data is not available at this frame
             return None
 
         try:
@@ -173,11 +178,12 @@ class CameraDataReader:
             raise ValueError(
                 f"image_type '{image_type}' must be either 'grayscale' or 'semantic'"
             )
+            # Camera data is not available at this frame
 
         # Extract the image from the tar file
         try:
             image_file = self._tar_file.extractfile(
-                f"images/{camera}/{image_type}/{file_name}"
+                f"cameras/{camera}/{image_type}/{file_name}"
             )
         except KeyError:
             raise RuntimeError(
@@ -211,7 +217,7 @@ class CameraDataReader:
                     camera, frame, "semantic"
                 )
 
-        return input_data
+        return dict(input_data)
 
         """
         input_data is a dictionary that contains the sensors data:
