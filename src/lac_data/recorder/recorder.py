@@ -88,7 +88,7 @@ class Recorder:
 
     def __call__(self, frame: int, input_data: dict):
         """Record a frame of data from the simulation."""
-        self.record_frame(frame, input_data)
+        self.record_all(frame, input_data)
 
     def record_all(self, frame: int, input_data: dict):
         """Record a frame of data from the simulation.
