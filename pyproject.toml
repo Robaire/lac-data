@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "lac_data"
+name = "lac-data"
 version = "0.1.0"
 description = "Data recording and processing for the Lunar Autonomy Challenge"
 authors = [
