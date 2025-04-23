@@ -1,5 +1,5 @@
-import os
 import tarfile
+from pathlib import Path
 from collections import defaultdict
 
 import numpy as np
@@ -24,7 +24,8 @@ class FrameDataReader:
         """
 
         # Check if the file exists
-        if not os.path.exists(path):
+        path = Path(path).expanduser().resolve()
+        if not path.exists():
             raise FileNotFoundError(f"File {path} not found")
 
         tar_file = tarfile.open(path, "r:gz")
@@ -62,7 +63,7 @@ class FrameDataReader:
 
     def __getitem__(self, frame: int) -> dict:
         """Convenience function to get a row from the frame data."""
-        return self._frames[self._frames["frame"] == frame][0].to_dict()
+        return self._frames[self._frames["frame"] == frame].to_dict()
 
     @property
     def initial(self) -> dict:
