@@ -278,10 +278,8 @@ class Recorder:
 
         if file_path.exists():
             # Append a timestamp to the file name
-            file_path = (
-                file_path.stem
-                / f"-{datetime.now().strftime('%H.%M.%S')}"
-                / file_path.suffix
+            file_path = file_path.with_stem(
+                f"{file_path.stem}-{datetime.now().strftime('%H.%M.%S')}"
             )
 
         # Return the file path
