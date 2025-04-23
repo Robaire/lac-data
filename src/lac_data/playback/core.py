@@ -63,7 +63,7 @@ class FrameDataReader:
 
     def __getitem__(self, frame: int) -> dict:
         """Convenience function to get a row from the frame data."""
-        return self._frames[self._frames["frame"] == frame].to_dict()
+        return self._frames[self._frames["frame"] == frame].to_dict(orient="records")[0]
 
     @property
     def initial(self) -> dict:
