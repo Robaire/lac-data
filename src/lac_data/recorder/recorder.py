@@ -18,7 +18,6 @@ class Recorder:
     agent: None  # AutonomousAgent
     max_size: float  # Maximum size of the archive in GB
     tar_path: Path  # Output archive path
-    file: io.BytesIO  # Output archive file
     tar_file: tarfile.TarFile  # Output archive
 
     # Recording state
@@ -47,9 +46,7 @@ class Recorder:
 
         # Create the archive file
         self.tar_path = self._parse_file_name(output)
-
-        self.file = open(self.tar_path, "wb")
-        self.tar_file = tarfile.open(fileobj=self.file, mode="w:gz")
+        self.tar_file = tarfile.open(self.tar_path, mode="w:gz")
 
         # Create numerical data buffers
         self.metadata = {
@@ -262,7 +259,7 @@ class Recorder:
     def _check_size(self):
         """Check if the archive is over the size limit."""
 
-        self.file.flush()
+        self.tar_file.fileobj.flush()
         if self.tar_path.stat().st_size > self.max_size * 1024 * 1024 * 1024:
             self.stop()
 
