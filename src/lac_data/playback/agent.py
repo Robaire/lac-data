@@ -157,15 +157,16 @@ class PlaybackAgent:
             return self._camera_data.get_frame(camera, self._frame, True)[
                 "light_intensity"
             ]
-        except KeyError:
+        except (ValueError, TypeError):
             # The camera was never enabled, so we can just return the initial value
             return self._frame_data.initial["cameras"][camera]["light_intensity"]
 
     def get_camera_state(self, camera: str) -> bool:
         try:
             return self._camera_data.get_frame(camera, self._frame, True)["enable"]
-        except KeyError:
-            # The camera was never enabled
+        except (ValueError, TypeError):
+            # ValueError: The camera was never enabled
+            # TypeError: There was no camera data for this frame
             return False
 
     def get_camera_position(self, camera: str) -> Transform:
@@ -175,7 +176,7 @@ class PlaybackAgent:
             rotation = [row["camera_roll"], row["camera_pitch"], row["camera_yaw"]]
             return Transform(p=translation, e=rotation)
 
-        except KeyError:
+        except (ValueError, TypeError):
             # The camera was never enabled
             # TODO: This could also return the initial camera positions from the rover geometry
             return Transform(
