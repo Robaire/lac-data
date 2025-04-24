@@ -1,4 +1,5 @@
-Data recording and replay utilities for the Lunar Autonomy Challenge.
+# LAC Data
+Data recording and replay utilities for the [Lunar Autonomy Challenge](https://lunar-autonomy-challenge.jhuapl.edu/index.php).
 Built for [MAPLE](https://github.com/Robaire/MAPLE).
 
 # Installation
@@ -6,7 +7,7 @@ Either:
 1. Add this repository as a dependency to your project, such as `uv add https://github.com/Robaire/lac-data.git`
 2. Install this repository into a virtual environment or your system `pip install git+https://github.com/Robaire/lac-data.git`
 
-# Usage
+# Recording Data
 ## Setup
 By default, the recorder will capture all rover state information and images from any active cameras when called.
 This can generate a significant amount of data if called frequently and if multiple cameras are active.
@@ -105,6 +106,71 @@ This would produce a csv file in the archive named `custom/gravity.csv` with the
 frame, location, accel
     1,    earth,  9.81
     2,     moon,  1.62
+```
+
+# Playback Data
+Sample data and an example playback script are included in `examples`.
+Two core classes, `FrameDataReader` and `CameraDataReader` are provided to access the numeric and image data from a `.lac` file.
+An additional `PlaybackAgent` is provided to mock agent behavior synchronized to a `.lac` file.
+
+## FrameDataReader
+The `FrameDataReader` provides direct access to [pandas](https://pandas.pydata.org/) `DataFrame`s for numerical data.
+
+```python
+reader = FrameDataReader("./examples/example.lac")
+reader.initial -> dict
+reader.frames -> pd.DataFrame
+reader.camera_frames -> dict[str, pd.DataFrame]
+reader.custom_records -> dict[str, pd.DataFrame]
+```
+
+## CameraDataReader
+The `CameraDataReader` provides access to camera specific numerical data and image data.
+Images are provided as [numpy](https://numpy.org/) arrays.
+
+```python
+reader = CameraDataReader("./examples/example.lac")
+reader.get_frame("FrontLeft", 20) -> dict
+reader.get_image("FrontLeft", 20, "grayscale") -> np.ndarray
+
+# Get a LAC style input_data dictionary
+reader.input_data(20) -> dict 
+```
+
+## PlaybackAgent
+`PlaybackAgent` mocks the functionality of the `AutonomousAgent` base class from the Lunar Autonomy Challenge.
+The agent provides most of the core functionality from the `AutonomousAgent` and can be used as a drop in replacement for any functions the query the agent directly for data.
+The `PlaybackAgent` also includes control functions to set the currently active frame from the data set, `set_frame()`, and to step to the next frame `step_frame()`.
+`input_data()` will provide an `input_data` dictionary normally provided by the simulator to the `run_step()` method of the `AutonomousAgent`.
+
+```python
+# Create a playback agent
+agent = PlaybackAgent("examples/example.lac")
+
+frame = 1
+done = False
+while not done:
+
+    # Get some data from the agent
+    imu_data = agent.get_imu_data()
+
+    # Do something with the data
+    print(f"Frame {frame}: {imu_data}")
+
+    # Get input data from the cameras
+    input_data = agent.input_data()
+
+    # Check if we reached the end of the recording
+    done = agent.at_end()
+
+    # Step the agent to the next frame
+    frame = agent.step_frame()
+
+# Jump to a specific frame
+agent.set_frame(120)
+
+# Get camera specific data:
+print(f"BackLeft Camera Enabled? {agent.get_camera_state('BackLeft')}")
 ```
 
 # Data Format
