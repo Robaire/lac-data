@@ -237,7 +237,10 @@ class Recorder:
 
     def record_custom(self, frame: int, record_name: str, data: dict):
         """Record custom data."""
-        data["frame"] = frame
+
+        # Add the frame index to the front of the dictionary
+        data = {"frame": frame, **data}
+
         try:
             self.custom_records[record_name].append(data)
         except KeyError:
