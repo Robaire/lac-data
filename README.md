@@ -4,8 +4,13 @@ Built for [MAPLE](https://github.com/Robaire/MAPLE).
 
 # Installation
 Either:
-1. Add this repository as a dependency to your project, such as `uv add https://github.com/Robaire/lac-data.git`
-2. Install this repository into a virtual environment or your system `pip install git+https://github.com/Robaire/lac-data.git`
+1. Add this repository as a dependency to your project:
+
+`uv add https://github.com/Robaire/lac-data.git`
+
+2. Install this repository into a virtual environment or your system:
+
+`pip install git+https://github.com/Robaire/lac-data.git`
 
 # Recording Data
 ## Setup
