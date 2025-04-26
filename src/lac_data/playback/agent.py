@@ -87,8 +87,8 @@ class PlaybackAgent:
 
     def get_initial_position(self) -> Transform:
         return Transform(
-            p=self._frame_data.initial["lander"][:3],
-            e=self._frame_data.initial["lander"][3:],
+            p=self._frame_data.initial["rover"][:3],
+            e=self._frame_data.initial["rover"][3:],
         )
 
     def get_initial_lander_position(self) -> Transform:
