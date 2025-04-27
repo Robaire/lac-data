@@ -2,6 +2,8 @@
 Data recording and replay utilities for the [Lunar Autonomy Challenge](https://lunar-autonomy-challenge.jhuapl.edu/index.php).
 Built for [MAPLE](https://github.com/Robaire/MAPLE).
 
+![Lunar Autonomy Challenge](https://lunar-autonomy-challenge.jhuapl.edu/Challenge-Documentation/img/robot.png)
+
 # Installation
 Either:
 1. Add this repository as a dependency to your project:
