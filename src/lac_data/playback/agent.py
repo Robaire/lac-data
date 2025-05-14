@@ -5,12 +5,13 @@ from .core import CameraDataReader, FrameDataReader
 class PlaybackAgent:
     """Mock agent class that can be used to playback data."""
 
-    _frame_data: FrameDataReader
-    _camera_data: CameraDataReader
-
-    _frame: int
-    _max_frame: int
-    _frame_data_row: dict
+    __slots__ = [
+        "_frame_data",
+        "_camera_data",
+        "_frame",
+        "_frame_data_row",
+        "_max_frame",
+    ]
 
     def __init__(self, data_path: str):
         """Initialize the playback agent.

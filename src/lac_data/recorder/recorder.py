@@ -13,25 +13,19 @@ from .._util import transform_to_tuple
 class Recorder:
     """Records data from a simulation run to an archive."""
 
-    # To use this, initialize it in the agent setup, and then call it every run_step
-    # When the agent is done, call stop to save the data
-    agent: None  # AutonomousAgent
-    max_size: float  # Maximum size of the archive in GB
-    tar_path: Path  # Output archive path
-    tar_file: tarfile.TarFile  # Output archive
-
-    # Recording state
-    done: bool = False  # Whether the recording is done
-    paused: bool = False  # Whether the recording is paused
-
-    # Data buffers
-    metadata: dict  # Metadata
-    initial: dict  # Initial data
-    frames: list  # Frames
-    camera_frames: dict  # Camera frames
-
-    # Custom recorders
-    custom_records: dict = {}  # Custom records
+    __slots__ = [
+        "agent",
+        "max_size",
+        "tar_path",
+        "tar_file",
+        "done",
+        "paused",
+        "metadata",
+        "initial",
+        "frames",
+        "camera_frames",
+        "custom_records",
+    ]
 
     def __init__(self, agent, output="", max_size: float = 10):
         """Initialize the recorder.
@@ -43,6 +37,8 @@ class Recorder:
         """
         self.agent = agent
         self.max_size = max_size
+        self.done = False
+        self.paused = False
 
         # Create the archive file
         self.tar_path = self._parse_file_name(output)
@@ -64,6 +60,7 @@ class Recorder:
         }
         self.frames = []
         self.camera_frames = {}
+        self.custom_records = {}
 
         # Record agent configuration and simulation start parameters
         self.initial["fiducials"] = self.agent.use_fiducials()  # bool
@@ -85,6 +82,9 @@ class Recorder:
         self._add_file(
             "initial.toml", io.BytesIO(toml.dumps(self.initial).encode("utf-8"))
         )
+
+        # Write a gitignore into the archive
+        self._add_file(".gitignore", io.BytesIO(b"*\n"))
 
     def __call__(self, frame: int, input_data: dict):
         """Record a frame of data from the simulation."""

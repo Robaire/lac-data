@@ -11,10 +11,12 @@ from PIL import Image
 class FrameDataReader:
     """Reads frame data from a LAC simulator recording."""
 
-    _initial: dict
-    _frames: pd.DataFrame
-    _camera_frames: dict[str, pd.DataFrame] = {}
-    _custom_records: dict[str, pd.DataFrame] = {}
+    __slots__ = [
+        "_initial",
+        "_frames",
+        "_camera_frames",
+        "_custom_records",
+    ]
 
     def __init__(self, path: str):
         """Read LAC simulator data from a file.
@@ -43,6 +45,7 @@ class FrameDataReader:
         self._frames = pd.read_csv(tar_file.extractfile("frames.csv"))
 
         # Read frame data for each camera
+        self._camera_frames = {}
         for camera in self._initial["cameras"].keys():
             try:
                 self._camera_frames[camera] = pd.read_csv(
@@ -53,6 +56,7 @@ class FrameDataReader:
                 pass
 
         # Read any custom records
+        self._custom_records = {}
         for record in tar_file.getnames():
             if record.startswith("custom/"):
                 self._custom_records[record.split("/")[-1].split(".")[0]] = pd.read_csv(
