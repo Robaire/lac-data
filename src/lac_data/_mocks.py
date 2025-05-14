@@ -1,7 +1,5 @@
 class _Location:
-    x: float
-    y: float
-    z: float
+    __slots__ = ["x", "y", "z"]
 
     def __init__(self, p):
         self.x = p[0]
@@ -10,9 +8,7 @@ class _Location:
 
 
 class _Rotation:
-    roll: float
-    pitch: float
-    yaw: float
+    __slots__ = ["roll", "pitch", "yaw"]
 
     def __init__(self, e):
         self.roll = e[0]
@@ -23,8 +19,7 @@ class _Rotation:
 class Transform:
     """Mock carla Transform class."""
 
-    location: _Location
-    rotation: _Rotation
+    __slots__ = ["location", "rotation"]
 
     def __init__(
         self,
