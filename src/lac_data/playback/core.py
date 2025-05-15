@@ -13,6 +13,7 @@ class FrameDataReader:
 
     __slots__ = [
         "_initial",
+        "_metadata",
         "_frames",
         "_camera_frames",
         "_custom_records",
@@ -40,6 +41,10 @@ class FrameDataReader:
             [self._initial[key] for key in ["fiducials", "lander", "rover", "cameras"]]
         except KeyError:
             raise ValueError("initial.toml is missing required keys")
+
+        self._metadata = toml.loads(
+            tar_file.extractfile("metadata.toml").read().decode("utf-8")
+        )
 
         # Read the frame sensor data
         self._frames = pd.read_csv(tar_file.extractfile("frames.csv"))
@@ -72,6 +77,10 @@ class FrameDataReader:
     @property
     def initial(self) -> dict:
         return self._initial
+
+    @property
+    def metadata(self) -> dict:
+        return self._metadata
 
     @property
     def frames(self) -> pd.DataFrame:
