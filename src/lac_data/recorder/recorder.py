@@ -20,6 +20,7 @@ class Recorder:
         "tar_file",
         "done",
         "paused",
+        "image_format",
         "metadata",
         "initial",
         "frames",
@@ -27,7 +28,9 @@ class Recorder:
         "custom_records",
     ]
 
-    def __init__(self, agent, output="", max_size: float = 10):
+    def __init__(
+        self, agent, output="", max_size: float = 10, image_format: str = "png"
+    ):
         """Initialize the recorder.
 
         Args:
@@ -39,6 +42,11 @@ class Recorder:
         self.max_size = max_size
         self.done = False
         self.paused = False
+
+        # Check what the image format to use
+        if image_format not in ["png", "jpg"]:
+            raise ValueError(f"Invalid image format: {image_format} must be png or jpg")
+        self.image_format = image_format
 
         # Create the archive file
         self.tar_path = self._parse_file_name(output)
@@ -250,11 +258,18 @@ class Recorder:
         """Add an image in the archive."""
 
         # Determine the filepath of the image
-        filepath = f"cameras/{str(camera)}/{type}/{str(camera)}_{type}_{str(frame)}.png"
+        filepath = f"cameras/{str(camera)}/{type}/{str(camera)}_{type}_{str(frame)}.{self.image_format}"
 
         # Convert the image to a PIL image and save it to a buffer
         buffer = io.BytesIO()
-        Image.fromarray(image).save(buffer, format="PNG")
+
+        if self.image_format == "png":
+            Image.fromarray(image).save(buffer, format="PNG")
+        elif self.image_format == "jpg":
+            Image.fromarray(image).save(
+                buffer, format="JPEG", quality=100, optimize=True, progressive=False
+            )
+
         self._add_file(filepath, buffer)
 
         return filepath
